@@ -1,0 +1,596 @@
+---
+title: "Evidencia 2"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+##### Juan Pablo Pérez Durán | A01639947
+##### Jonathan Joaquín Quirino Carrasco | A01640100
+##### Joel Isaias Solano Ocampo | A01639289
+##### Axel Jarquín Morga | A01636324
+
+##Enlace del video de evidencia: https://youtu.be/tQWcqliFkPs
+
+```{r}
+
+setwd("C:/Users/Jonathan Quirino/Desktop/Itesm_SEM2/Periodo 2/Biologica Comput/evidencia2")
+
+library(tidyverse)
+library(Biostrings)
+library(seqinr)
+library(adegenet)
+library(ape)
+library(ggtree)
+library(DECIPHER)
+library(viridis)
+library(ggplot2)
+library(dplyr)
+
+secLen <- function(sec) {
+  return(length(sec))
+}
+
+basePorcentaje <- function(sec) {
+  a <- 0
+  c <- 0
+  t <- 0
+  g <- 0
+  sec_len <- secLen(sec)
+  
+  for (i in 1:sec_len) {
+    if (sec[i] == "a") {
+      a <- a + 1
+    }
+    if (sec[i] == "c") {
+      c <- c + 1
+    }
+    if (sec[i] == "t") {
+      t <- t + 1
+    }
+    if (sec[i] == "g") {
+      g <- g + 1
+    }
+  }
+  
+  Nombre <- c('Adenina', 'Timina', 'Citosina', 'Guanina')
+  Cantidad <- c(a, c, t, g)
+  Porcentaje <- c((a/sec_len)*100, (c/sec_len)*100, (t/sec_len)*100, (g/sec_len)*100)
+  
+  length_graph <- data.frame(Nombre, Cantidad, Porcentaje); return(length_graph)
+}
+
+OPorcentaje <- function(sec) {
+  a <- 0
+  c <- 0
+  t <- 0
+  g <- 0
+  sec_len <- secLen(sec)
+  
+  for (i in 1:sec_len) {
+    if (sec[i] == "a") {
+      a <- a + 1
+    }
+    if (sec[i] == "c") {
+      c <- c + 1
+    }
+    if (sec[i] == "t") {
+      t <- t + 1
+    }
+    if (sec[i] == "g") {
+      g <- g + 1
+    }
+  }
+  
+  Nombre <- c('Adenina', 'Timina', 'Citosina', 'Guanina')
+  Cantidad <- c(a, c, t, g)
+  Porcentaje <- c((a/sec_len)*100, (c/sec_len)*100, (t/sec_len)*100, (g/sec_len)*100); return(Porcentaje)
+}
+
+
+invert <- function(dna){
+  return(rev(dna))
+}
+```
+### Secuencias de genomas con sus respectivas longitudes y contenido nucleótido
+#### Variante de Estados Unidos
+```{r}
+Sars_USA <- c("MW133981")
+Sars_USA_sq <- read.GenBank(Sars_USA)
+write.dna(Sars_USA_sq, file = "Sars_USA_sq.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ", colw = 10)
+Sars_USA_sq_fasta <- read.fasta(file = "Sars_USA_sq.fasta")
+Sars_USA_sq_fasta
+```
+###### Longitud
+```{r}
+
+len_USA <- getLength(Sars_USA_sq_fasta)
+len_USA
+```
+###### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_USA_sq_fasta[[1]])
+PrUSA <- OPorcentaje(Sars_USA_sq_fasta[[1]])
+
+PrA_USA <- PrUSA[[1]]
+
+PrT_USA <- PrUSA[[2]]
+
+PrC_USA <- PrUSA[[3]]
+
+PrG_USA <- PrUSA[[4]]
+```
+#### Variante de India
+```{r}
+Sars_IND <- c("MT577009")
+Sars_IND_sq <- read.GenBank(Sars_IND)
+write.dna(Sars_IND_sq, file = "Sars_IND_sq.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ", colw= 10)
+Sars_IND_sq_fasta <- read.fasta(file = "Sars_IND_sq.fasta")
+Sars_IND_sq_fasta
+```
+###### Longitud
+```{r}
+len_IND <- getLength(Sars_IND_sq_fasta)
+len_IND
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_IND_sq_fasta[[1]])
+PrIND <- OPorcentaje(Sars_IND_sq_fasta[[1]])
+
+PrA_IND <- PrIND[[1]]
+
+PrT_IND <- PrIND[[2]]
+
+PrC_IND <- PrIND[[3]]
+
+PrG_IND <- PrIND[[4]]
+```
+#### Variante de Brasil
+```{r}
+Sars_BRA <- c("MT835383")
+Sars_BRA_sq <- read.GenBank(Sars_BRA)
+write.dna(Sars_BRA_sq, file = "Sars_BRA_sq.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ", colw= 10)
+Sars_BRA_sq_fasta <- read.fasta(file = "Sars_BRA_sq.fasta")
+Sars_BRA_sq_fasta
+```
+##### Longitud
+```{r}
+
+len_BRA <- getLength(Sars_BRA_sq_fasta)
+len_BRA
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_BRA_sq_fasta[[1]])
+PrBRA <- OPorcentaje(Sars_BRA_sq_fasta[[1]])
+
+PrA_BRA <- PrBRA[[1]]
+
+PrT_BRA <- PrBRA[[2]]
+
+PrC_BRA <- PrBRA[[3]]
+
+PrG_BRA <- PrBRA[[4]]
+```
+#### Variante de Rusia
+```{r}
+Sars_RUS <- c("MT890462")
+Sars_RUS_sq <- read.GenBank(Sars_RUS)
+write.dna(Sars_RUS_sq, file = "Sars_RUS_sq.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ", colw= 10)
+Sars_RUS_sq_fasta <- read.fasta(file = "Sars_RUS_sq.fasta")
+Sars_RUS_sq_fasta
+```
+##### Longitud
+```{r}
+
+len_RUS <- getLength(Sars_RUS_sq_fasta)
+len_RUS
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_RUS_sq_fasta[[1]])
+PrRUS <- OPorcentaje(Sars_RUS_sq_fasta[[1]])
+
+PrA_RUS <- PrRUS[[1]]
+
+PrT_RUS <- PrRUS[[2]]
+
+PrC_RUS <- PrRUS[[3]]
+
+PrG_RUS <- PrRUS[[4]]
+```
+#### Variante de España
+```{r}
+Sars_ESP <- c("MW056032")
+Sars_ESP_sq <- read.GenBank(Sars_ESP)
+write.dna(Sars_ESP_sq, file = "Sars_ESP_sq.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ", colw= 10)
+Sars_ESP_sq_fasta <- read.fasta(file = "Sars_ESP_sq.fasta")
+Sars_ESP_sq_fasta
+```
+##### Longitud
+```{r}
+
+len_ESP <- getLength(Sars_ESP_sq_fasta)
+len_ESP
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_ESP_sq_fasta[[1]])
+PrESP <- OPorcentaje(Sars_ESP_sq_fasta[[1]])
+
+PrA_ESP <- PrESP[[1]]
+
+PrT_ESP <- PrESP[[2]]
+
+PrC_ESP <- PrESP[[3]]
+
+PrG_ESP <- PrESP[[4]]
+```
+#### Variante de Colombia
+```{r}
+Sars_COL <- c("MT470219") 
+Sars_COL_sq <- read.GenBank(Sars_COL)
+write.dna(Sars_COL_sq, file = "Sars_COL_sq.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ", colw= 10)
+Sars_COL_sq_fasta <- read.fasta(file = "Sars_COL_sq.fasta")
+Sars_COL_sq_fasta
+```
+##### Longitud
+```{r}
+
+len_COL <- getLength(Sars_COL_sq_fasta)
+len_COL
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_COL_sq_fasta[[1]])
+PrCOL <- OPorcentaje(Sars_COL_sq_fasta[[1]])
+
+PrA_COL <- PrCOL[[1]]
+
+PrT_COL <- PrCOL[[2]]
+
+PrC_COL <- PrCOL[[3]]
+
+PrG_COL <- PrCOL[[4]]
+```
+#### Variante de Francia
+```{r}
+Sars_FRA <- c("MT594401")
+Sars_FRA_sq <- read.GenBank(Sars_FRA)
+write.dna(Sars_FRA_sq, file = "Sars_FRA_sq.fasta", format = "fasta", append = FALSE)
+Sars_FRA_sq_fasta <- read.fasta(file = "Sars_FRA_sq.fasta")
+Sars_FRA_sq_fasta
+```
+##### Longitud
+```{r}
+
+len_FRA <- getLength(Sars_FRA_sq_fasta)
+len_FRA
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_FRA_sq_fasta[[1]])
+PrFRA <- OPorcentaje(Sars_FRA_sq_fasta[[1]])
+
+PrA_FRA <- PrFRA[[1]]
+
+PrT_FRA <- PrFRA[[2]]
+
+PrC_FRA <- PrFRA[[3]]
+
+PrG_FRA <- PrFRA[[4]]
+```
+#### Variante de Perú
+```{r}
+Sars_PER <- c("MW030193")
+Sars_PER_sq <- read.GenBank(Sars_PER)
+write.dna(Sars_PER_sq, file = "Sars_PER_sq.fasta", format = "fasta", append = FALSE)
+Sars_PER_sq_fasta <- read.fasta(file = "Sars_PER_sq.fasta")
+Sars_PER_sq_fasta
+```
+##### Longitud
+```{r}
+len_PER <- getLength(Sars_PER_sq_fasta)
+len_PER
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_PER_sq_fasta[[1]])
+PrPER <- OPorcentaje(Sars_PER_sq_fasta[[1]])
+
+PrA_PER <- PrPER[[1]]
+
+PrT_PER <- PrPER[[2]]
+
+PrC_PER <- PrPER[[3]]
+
+PrG_PER <- PrPER[[4]]
+```
+#### Variante de México
+```{r}
+Sars_MEX <- c("MT324062")
+Sars_MEX_sq <- read.GenBank(Sars_MEX)
+write.dna(Sars_MEX_sq, file = "Sars_MEX_sq.fasta", format = "fasta", append = FALSE)
+Sars_MEX_sq_fasta <- read.fasta(file = "Sars_MEX_sq.fasta")
+Sars_MEX_sq_fasta
+```
+##### Longitud
+```{r}
+len_MEX <- getLength(Sars_MEX_sq_fasta)
+len_MEX
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_MEX_sq_fasta[[1]])
+PrMEX <- OPorcentaje(Sars_MEX_sq_fasta[[1]])
+
+PrA_MEX <- PrMEX[[1]]
+
+PrT_MEX <- PrMEX[[2]]
+
+PrC_MEX <- PrMEX[[3]]
+
+PrG_MEX <- PrMEX[[4]]
+```
+#### Variante de Reino Unido
+```{r}
+Sars_GBR <- c("MW041156")
+Sars_GBR_sq <- read.GenBank(Sars_GBR)
+write.dna(Sars_GBR_sq, file = "Sars_GBR_sq.fasta", format = "fasta", append = FALSE)#
+Sars_GBR_sq_fasta <- read.fasta(file = "Sars_GBR_sq.fasta")
+Sars_GBR_sq_fasta
+```
+##### Longitud
+```{r}
+len_GBR <- getLength(Sars_GBR_sq_fasta)
+len_GBR
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_GBR_sq_fasta[[1]])
+PrGBR <- OPorcentaje(Sars_GBR_sq_fasta[[1]])
+
+PrA_GBR <- PrGBR[[1]]
+
+PrT_GBR <- PrGBR[[2]]
+
+PrC_GBR <- PrGBR[[3]]
+
+PrG_GBR <- PrGBR[[4]]
+```
+#### Variante de Sudáfrica
+```{r}
+Sars_ZAF <- c("MT324062")
+Sars_ZAF_sq <- read.GenBank(Sars_ZAF)
+write.dna(Sars_ZAF_sq, file = "Sars_ZAF_sq.fasta", format = "fasta", append = FALSE)
+Sars_ZAF_sq_fasta <- read.fasta(file = "Sars_ZAF_sq.fasta")
+Sars_ZAF_sq_fasta
+```
+##### Longitud
+```{r}
+len_ZAF <- getLength(Sars_ZAF_sq_fasta)
+len_ZAF
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_ZAF_sq_fasta[[1]])
+PrZAF <- OPorcentaje(Sars_ZAF_sq_fasta[[1]])
+
+PrA_ZAF <- PrZAF[[1]]
+
+PrT_ZAF <- PrZAF[[2]]
+
+PrC_ZAF <- PrZAF[[3]]
+
+PrG_ZAF <- PrZAF[[4]]
+```
+#### Variante de Irán
+```{r}
+Sars_IRN <- c("MT994849")
+Sars_IRN_sq <- read.GenBank(Sars_IRN)
+write.dna(Sars_IRN_sq, file = "Sars_IRN_sq.fasta", format = "fasta", append = FALSE)
+Sars_IRN_sq_fasta <- read.fasta(file = "Sars_IRN_sq.fasta")
+Sars_IRN_sq_fasta
+```
+##### Longitud
+```{r}
+len_IRN <- getLength(Sars_IRN_sq_fasta)
+len_IRN
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_IRN_sq_fasta[[1]])
+PrIRN <- OPorcentaje(Sars_IRN_sq_fasta[[1]])
+
+PrA_IRN <- PrIRN[[1]]
+
+PrT_IRN <- PrIRN[[2]]
+
+PrC_IRN <- PrIRN[[3]]
+
+PrG_IRN <- PrIRN[[4]]
+```
+#### Variante de Chile
+```{r}
+Sars_CHL <- c("MT670013")
+Sars_CHL_sq <- read.GenBank(Sars_CHL)
+write.dna(Sars_CHL_sq, file = "Sars_CHL_sq.fasta", format = "fasta", append = FALSE)
+Sars_CHL_sq_fasta <- read.fasta(file = "Sars_CHL_sq.fasta")
+Sars_CHL_sq_fasta
+```
+##### Longitud
+```{r}
+len_CHL <-getLength(Sars_CHL_sq_fasta)
+len_CHL
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_CHL_sq_fasta[[1]])
+PrCHL <- OPorcentaje(Sars_CHL_sq_fasta[[1]])
+
+PrA_CHL <- PrCHL[[1]]
+
+PrT_CHL <- PrCHL[[2]]
+
+PrC_CHL <- PrCHL[[3]]
+
+PrG_CHL <- PrCHL[[4]]
+```
+#### Variante de Irak
+```{r}
+Sars_IRQ <- c("MT940481")
+Sars_IRQ_sq <- read.GenBank(Sars_IRQ)
+write.dna(Sars_IRQ_sq, file = "Sars_IRQ_sq.fasta", format = "fasta", append = FALSE)
+Sars_IRQ_sq_fasta <- read.fasta(file = "Sars_IRQ_sq.fasta")
+Sars_IRQ_sq_fasta
+```
+##### Longitud
+```{r}
+len_IRQ <- getLength(Sars_IRQ_sq_fasta)
+len_IRQ
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_IRQ_sq_fasta[[1]])
+PrIRQ <- OPorcentaje(Sars_IRQ_sq_fasta[[1]])
+
+PrA_IRQ <- PrIRQ[[1]]
+
+PrT_IRQ <- PrIRQ[[2]]
+
+PrC_IRQ <- PrIRQ[[3]]
+
+PrG_IRQ <- PrIRQ[[4]]
+```
+#### Variante de Italia
+```{r}
+Sars_ITA <- c("MW134558")
+Sars_ITA_sq <- read.GenBank(Sars_ITA)
+write.dna(Sars_ITA_sq, file = "Sars_ITA_sq.fasta", format = "fasta", append = FALSE)
+Sars_ITA_sq_fasta <- read.fasta(file = "Sars_ITA_sq.fasta")
+Sars_ITA_sq_fasta
+```
+##### Longitud
+```{r}
+len_ITA <- getLength(Sars_ITA_sq_fasta)
+len_ITA
+```
+##### Contenido de nucleótidos
+```{r}
+basePorcentaje(Sars_ITA_sq_fasta[[1]])
+PrITA <- OPorcentaje(Sars_ITA_sq_fasta[[1]])
+
+PrA_ITA <- PrITA[[1]]
+
+PrT_ITA <- PrITA[[2]]
+
+PrC_ITA <- PrITA[[3]]
+
+PrG_ITA <- PrITA[[4]]
+```
+# Gráfica de comparación de longitudes 
+```{r}
+length_graph <- data.frame(Variante = c("USA","IND","BRA","RUS","ESP","COL","FRA","PER","MEX","GBR","ZAF","IRN","CHL","IRQ","ITA"),
+                longitud = c(len_USA, len_IND, len_BRA, len_RUS, len_ESP, len_COL, len_FRA, len_PER, len_MEX, len_GBR, len_ZAF, len_IRN, len_CHL,
+                             len_IRQ, len_ITA))
+
+p <- ggplot(data = length_graph, aes(x = Variante, y = longitud)) +
+   geom_bar(stat="identity", fill = "steelblue")+
+  geom_text(aes(label=longitud),vjust = -1,color = "black", size = 3)+
+  theme_minimal()
+
+p
+```
+# Gráfica de contenido de nucleótidos
+```{r}
+ATCG_USA <- data.frame(variante = c("USA"),
+                       a = c(PrA_USA),
+                       t = c(PrT_USA),
+                       c = c(PrC_USA),
+                       g = c(PrG_USA))
+
+
+ATCG_graph1 <- data.frame(Variante = c("USA","IND","BRA","RUS","ESP"),
+                         a=c(PrA_USA, PrA_IND, PrA_BRA, PrA_RUS, PrA_ESP),
+                         t=c(PrT_USA, PrT_IND, PrT_BRA, PrT_RUS, PrT_ESP),
+                         c=c(PrC_USA, PrC_IND, PrC_BRA, PrC_RUS, PrC_ESP),
+                         g=c(PrG_USA, PrG_IND, PrG_BRA, PrG_RUS, PrG_ESP))
+
+ATCG_graph2 <- data.frame(Variante = c("COL","FRA","PER","MEX","GBR"),
+                          a=c(PrA_COL, PrA_FRA, PrA_PER, PrA_MEX, PrA_GBR),
+                          t=c(PrT_COL, PrT_FRA, PrT_PER, PrT_MEX, PrT_GBR),
+                          c=c(PrC_COL, PrC_FRA, PrC_PER, PrC_MEX, PrC_GBR),
+                          g=c(PrG_COL, PrG_FRA, PrG_PER, PrG_MEX, PrG_GBR))
+          
+ATCG_graph3 <- data.frame(Variante = c("ZAF","IRN","CHL","IRQ","ITA"),
+                          a=c(PrA_ZAF, PrA_IRN, PrA_CHL, PrA_IRQ, PrA_ITA),
+                          t=c(PrT_ZAF, PrT_IRN, PrT_CHL, PrT_IRQ, PrT_ITA),
+                          c=c(PrC_ZAF, PrC_IRN, PrC_CHL, PrC_IRQ, PrC_ITA),
+                          g=c(PrG_ZAF, PrG_IRN, PrG_CHL, PrG_IRQ, PrG_ITA))
+
+ATCG_graph1 %>%
+  gather(key, Porcentaje, -Variante) %>%
+  ggplot(aes(x=Variante, y=Porcentaje, fill = key)) +
+  geom_col(position = "dodge") + 
+  geom_text(aes(label = format(round(Porcentaje, 2), nsmall = 2)), vjust = 1.6, color = "black",
+            position = position_dodge2(0.9), size = 3.5) +
+  theme_minimal()
+  
+ATCG_graph2 %>%
+  gather(key, Porcentaje, -Variante) %>%
+  ggplot(aes(x=Variante, y=Porcentaje, fill = key)) +
+  geom_col(position = "dodge") + 
+  geom_text(aes(label = format(round(Porcentaje, 2), nsmall = 2)), vjust = 1.6, color = "black",
+            position = position_dodge2(0.9), size = 3.5) +
+  theme_minimal()
+
+ATCG_graph3 %>%
+  gather(key, Porcentaje, -Variante) %>%
+  ggplot(aes(x=Variante, y=Porcentaje, fill = key)) +
+  geom_col(position = "dodge") + 
+  geom_text(aes(label = format(round(Porcentaje, 2), nsmall = 2)), vjust = 1.6, color = "black",
+            position = position_dodge2(0.9), size = 3.5) +
+  theme_minimal()
+
+```
+```{r}
+## La parte 2.2 empieza a partir de aqui
+
+virus <- c("MW133981","MT577009", "MT835383", "MT890462", "MW056032", "MT470219", "MT594401", "MW030193", "MT810758", "MW041156", "MT324062", "MT994849", "MT670013", "MT940481", "MW134558")
+
+virus_sequences <- read.GenBank(virus)
+
+write.dna(virus_sequences, file = "virus_seqs.fasta", format = "fasta", append = FALSE, nbcol = 6, colsep = " ",colw = 10)
+
+not_aligned_virus_seq <- readDNAStringSet("virus_seqs.fasta",format = "fasta")
+not_aligned_virus_seq
+
+not_aligned_virus_seq <- OrientNucleotides(not_aligned_virus_seq)
+aligned_virus_seq <- AlignSeqs(not_aligned_virus_seq)
+
+BrowseSeqs(aligned_virus_seq,highlight = 0)
+
+
+writeXStringSet(aligned_virus_seq, file = "aligned_virus_seq.fasta")
+
+virus_aligned <- read.alignment("aligned_virus_seq.fasta",format = "fasta")
+matriz_distancia <- dist.alignment(virus_aligned,matrix = "similarity")
+
+temp <- as.data.frame(as.matrix(matriz_distancia))
+table.paint(temp, cleg=0, clabel.row = .5, clabel.col = .5) + scale_color_viridis()
+
+
+virus_tree <- nj(matriz_distancia)
+class(virus_tree)
+
+virus_tree <- ladderize(virus_tree)
+
+plot(virus_tree, cex = 0.6)
+title("Arbol filogenético a partir de la matriz de distancia y numeros de accesion")
+
+ggtree(virus_tree)
+ggtree(virus_tree, layout = "slanted")
+ggtree(virus_tree, layout = "circular")
+
+```
